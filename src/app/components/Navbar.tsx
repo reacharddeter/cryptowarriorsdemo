@@ -4,10 +4,11 @@ import Link from "next/link";
 import { ConnectButton, lightTheme, useActiveAccount } from "thirdweb/react";
 import Image from "next/image";
 import LOGO_Maroon from "@public/LOGO_Maroon.png";
+import { createWallet, inAppWallet } from "thirdweb/wallets";
 
 const Navbar = () => {
   const account = useActiveAccount();
-
+  const wallets = [createWallet("io.metamask")];
   return (
     <nav className="bg-slate-100 border-b-2 border-b-slate-300">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -83,6 +84,11 @@ const Navbar = () => {
                     Instructions
                   </p>
                 </Link>
+                <Link href={"/https://cryptowarriors.netlify.app/"}>
+                  <p className="rounded-md px-3 py-2 text-sm font-medium text-slate-700">
+                    Go back
+                  </p>
+                </Link>
               </div>
             </div>
           </div>
@@ -95,6 +101,7 @@ const Navbar = () => {
                   maxHeight: "50px",
                 },
               }}
+              wallets={wallets}
             />
           </div>
         </div>
