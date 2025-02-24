@@ -84,7 +84,7 @@ const Navbar = () => {
                     Instructions
                   </p>
                 </Link>
-                <Link href={"/https://cryptowarriors.netlify.app/"}>
+                <Link href={"https://cryptowarriors.netlify.app/"}>
                   <p className="rounded-md px-3 py-2 text-sm font-medium text-slate-700">
                     Go back
                   </p>
