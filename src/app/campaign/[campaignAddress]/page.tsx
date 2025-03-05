@@ -3,7 +3,7 @@
 import { client } from "@/app/client";
 import TierCard from "@/app/components/TierCard";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getContract, prepareContractCall, ThirdwebContract } from "thirdweb";
 import { baseSepolia } from "thirdweb/chains";
 import {
@@ -18,6 +18,7 @@ export default function CampaignPage() {
   const { campaignAddress } = useParams();
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isGoalAchieved, setIsGoalAchieved] = useState(false);
 
   const contract = getContract({
     client: client,
@@ -88,6 +89,19 @@ export default function CampaignPage() {
     params: [],
   });
 
+  let totalBackers;
+  if (tiers) {
+    totalBackers = tiers.reduce((sum, tier) => sum + Number(tier.backers), 0);
+  }
+
+  useEffect(() => {
+    if (balance >= goal) {
+      setIsGoalAchieved(true);
+    }
+  }, [balance]);
+
+  console.log("this is the balance: ", balance);
+
   return (
     <div className="mx-auto max-w-7xl px-2 mt-4 sm:px-6 lg:px-8">
       <div className="flex flex-row justify-between items-center">
@@ -105,7 +119,7 @@ export default function CampaignPage() {
         )}
       </div>
 
-      {/* {owner === account?.address && (
+      {/* {owner === account?.address && balance >= goal && (
         <div className="flex flex-row">
           <TransactionButton
             transaction={() =>
@@ -129,6 +143,7 @@ export default function CampaignPage() {
               fontWeight: "bold",
               padding: "1rem",
             }}
+            disabled={balance <= 0 && totalBackers > 0}
           >
             Withdraw
           </TransactionButton>
@@ -163,23 +178,29 @@ export default function CampaignPage() {
         </div>
       )}
       <div>
+        {balance >= goal ? (
+          <p className="text-2xl font-bold text-green-600">
+            Goal Reached!{" "}
+            <span className="text-red-900">Can't fund no more</span>
+          </p>
+        ) : (
+          ""
+        )}
         <p className="text-lg font-semibold">Tiers: </p>
         <div className="grid grid-cols-3 gap-4">
-          {isLoadingTiers ? (
-            <p>Loading...</p>
-          ) : tiers && tiers.length > 0 ? (
-            tiers.map((tier, index) => (
-              <TierCard
-                key={index}
-                tier={tier}
-                index={index}
-                contract={contract}
-                isEditing={isEditing}
-              />
-            ))
-          ) : (
-            !isEditing && <p>No Tiers Available</p>
-          )}
+          {balance >= goal || (Number(balance) === 0 && totalBackers > 0)
+            ? ""
+            : tiers && tiers.length > 0
+            ? tiers.map((tier, index) => (
+                <TierCard
+                  key={index}
+                  tier={tier}
+                  index={index}
+                  contract={contract}
+                  isEditing={isEditing}
+                />
+              ))
+            : !isEditing && <p>No Tiers Available</p>}
           {isEditing && (
             <button
               className="max-w-sm flex flex-col text-center justify-center items-center font-semibold p-6 bg-blue-500 text-white border border-slate-100 rounded-lg shadow"
